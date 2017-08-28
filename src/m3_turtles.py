@@ -116,6 +116,14 @@ akil.forward(50)
 #
 #   Then COMMIT and Push your work using the VCS menu option.
 #
+#   Reminder of those steps...
+#   COMMIT your work by selecting VCS from the menu bar, then select Commit Changes
+#   Make sure only the files you want to commit are checked and optionally
+#   add a quick Commit message to describe your work.  Then hover over the
+#   Commit button and select Commit and Push.  Commit saves the work to
+#   your computer.  "and Push" saves a copy of your work up into your Github
+#   repository (saving to the cloud is a better way to permanently safe work).
+#
 #   You can COMMIT as often as you like.  DO FREQUENT COMMITS.
 #
 ########################################################################
