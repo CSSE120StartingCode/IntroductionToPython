@@ -44,7 +44,7 @@ print('Hello, World')
 # finished all the exercises in a module -- there will be no blue bars
 # left on the scrollbar-like thing to the right.
 #
-# You have now completed TO DO #2, so change its TO DO on line 26 to DONE
+# You have now completed TO DO #2, so change its TO DO on line 29 to DONE
 # (and proceed similarly for all forthcoming TODOs in this course).
 #
 ########################################################################
