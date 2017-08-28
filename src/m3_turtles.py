@@ -55,24 +55,24 @@ window.delay(20)  # Bigger numbers mean slower animation.
 # ----------------------------------------------------------------------
 # Makes (constructs) a   SimpleTurtle   object.
 # ----------------------------------------------------------------------
-nadia = rg.SimpleTurtle()
+dave = rg.SimpleTurtle()
 
 # ----------------------------------------------------------------------
 # Ask the SimpleTurtle objects to do things:
 # ----------------------------------------------------------------------
-nadia.forward(100)
-nadia.left(90)
-nadia.forward(200)
+dave.forward(100)
+dave.left(90)
+dave.forward(200)
 
 # ----------------------------------------------------------------------
 # Construct a new turtle and ask it to do things.
 # ----------------------------------------------------------------------
-akil = rg.SimpleTurtle('turtle')
-akil.pen = rg.Pen('red', 30)
-akil.speed = 10  # Faster
-akil.backward(50)
-akil.left(90)
-akil.forward(50)
+matt = rg.SimpleTurtle('turtle')
+matt.pen = rg.Pen('red', 30)
+matt.speed = 10  # Faster
+matt.backward(50)
+matt.left(90)
+matt.forward(50)
 
 
 ########################################################################
@@ -93,7 +93,7 @@ akil.forward(50)
 #
 # TODO: 4.
 #   The code above  CONSTRUCTS  two SimpleTurtle objects and gives those objects NAMES:
-#       nadia    akil
+#       dave    matt
 #
 #   Below this TO DO comment construct another SimpleTurtle object,
 #       naming it whatever you want.
