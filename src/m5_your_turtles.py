@@ -2,11 +2,11 @@
 Your chance to explore Loops and Turtles!
 
 Authors: David Mutchler, Dave Fisher, Valerie Galluzzi, Amanda Stouder,
-         their colleagues and PUT_YOUR_NAME_HERE.  November 2016.
+         their colleagues and PUT_YOUR_NAME_HERE.
 """
 ########################################################################
 # TODO: 1.
-# On Line 5 above, replace  PUT_YOUR_NAME_HERE  with your OWN name.
+# On Line 5 above, replace  PUT_YOUR_NAME_HERE  with your own name.
 ########################################################################
 
 ########################################################################
@@ -26,5 +26,5 @@ Authors: David Mutchler, Dave Fisher, Valerie Galluzzi, Amanda Stouder,
 #  If you make syntax (notational) errors, no worries -- get help
 #  fixing them at either this session OR at the NEXT session.
 #
-#  Don't forget to COMMIT your work by using  SVN ~ Commit.
+#  Don't forget to COMMIT your work by using  VCS ~ Commit and Push.
 ########################################################################

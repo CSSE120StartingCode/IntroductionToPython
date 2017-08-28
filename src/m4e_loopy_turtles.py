@@ -42,7 +42,7 @@ Concepts include:
         rg.PaintBucket()
 
 Authors: David Mutchler, Dave Fisher, Valerie Galluzzi, Amanda Stouder,
-         and their colleagues.  November 2016.
+         and their colleagues.
 """
 import rosegraphics as rg
 
@@ -62,7 +62,7 @@ for k in range(13):
     blue_turtle.draw_square(size)
 
     # Move a little below and to the right of where the previous
-    # square started.  Do this with the pen up (so nothing drawn).
+    # square started.  Do this with the pen up (so nothing is drawn).
     blue_turtle.pen_up()
     blue_turtle.right(45)
     blue_turtle.forward(10)

@@ -33,7 +33,7 @@ import rosegraphics as rg
 #   Allow this file to use the rosegraphics.py file by marking the src
 #   directory as a "Sources Root".  Do that by right clicking on the src folder,
 #   then selector  Mark Directory As --> Sources Root
-#   You will do that for every project that uses rosegraphics so get used to it. :)
+#   You will do that once for every project that uses rosegraphics so get used to it. :)
 #
 #   Run this module by Right clicking in this window and select Run 'filename'
 #   A window will pop up and Turtles will move around.  After the
