@@ -68,7 +68,7 @@ nadia.forward(200)
 # ----------------------------------------------------------------------
 akil = rg.SimpleTurtle('turtle')
 akil.pen = rg.Pen('red', 30)
-akil.speed = 1
+akil.speed = 10  # Faster
 akil.backward(50)
 akil.left(90)
 akil.forward(50)
