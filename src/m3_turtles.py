@@ -33,6 +33,7 @@ import rosegraphics as rg
 #   Allow this file to use the rosegraphics.py file by marking the src
 #   directory as a "Sources Root".  Do that by right clicking on the src folder,
 #   then selector  Mark Directory As --> Sources Root
+#   Watch the red underlines on the line of code above disappear as you do that step.
 #   You will do that once for every project that uses rosegraphics so get used to it. :)
 #
 #   Run this module by Right clicking in this window and select Run 'filename'
@@ -72,6 +73,7 @@ akil.speed = 1
 akil.backward(50)
 akil.left(90)
 akil.forward(50)
+
 
 ########################################################################
 #
