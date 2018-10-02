@@ -13,4 +13,4 @@ print('Hello, World')
 print('hi there')
 print('one', 'two', 'buckle my shoe')
 print(3 + 9)
-print('3 + 9', 'versus', 3 + 9)
+print('3 + 9', 'versus', 3 + 9) # Here the former is printed as a string of characters and the second is printed as the sum of numbers.
