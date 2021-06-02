@@ -1,14 +1,14 @@
 """
 rosegraphics.py - a simple Graphics library for Python.
+
 Its key feature is:
   -- USING this library provides a simple introduction to USING objects.
 
 Other key features include:
   -- It has a rich set of classes, methods and instance variables.
-       -- In addition to classes like Circles that are natural for
-            students, it has other kinds of classes like RoseWindow
-            and FortuneTeller to provide a richer set of examples
-            than "just" a graphics library.
+       In addition to classes like Circles that are natural for students,
+       it has other kinds of classes like RoseWindow and SimpleTurtle
+       to provide a richer set of examples than "just" a graphics library.
   -- It allows one to do a reasonable set of graphics operations
        with reasonable efficiency. The API mimics Java's Shape API
        for the most part.
@@ -16,12 +16,12 @@ Other key features include:
        (the standard graphics libraries that come with Python).
   -- Unlike tkinter, it is NOT event-driven and hence can be used
        before students see that paradigm.  (There is a behind-the-scenes
-       facilty for listening for and responding to events,
+       facility for listening for and responding to events,
        for those who want to do so.)
   -- It attempts to be as bullet-proof as possible, to make it easy
        for beginners to use it.  In particular, it attempts to provide
        reasonable error messages when a student misuses the API.
-  -- It was inspired by zellegraphics but is a complete re-implemenation
+  -- It was inspired by zellegraphics but is a complete re-implementation
        that attempts to:
        -- Be more bullet-proof.
        -- Provide a richer set of examples for using objects.
@@ -40,25 +40,6 @@ Authors: David Mutchler, Mark Hays, Michael Wollowswki, Matt Boutell,
          First completed version: September 2014.
 """
 
-# FIXME (errors):
-#  -- clone() does not really make a copy; it just makes a new one
-#     but without cloning all the attributes.
-#  -- _ShapeWithCenter claims that things like Ellipse are subclasses,
-#     but they are not at this point, I think.  In general, need to
-#     deal with overlap between _ShapeWithCenter and _RectangularShape.
-#     KEEP both of them to have some classes have corner_1 and corner_2
-#     while others have center and ...
-
-# FIXME (things that have yet to be implemented):
-#  -- Allow multiple canvasses.
-#  -- Better close_on ... ala zellegraphics.
-#  -- Keyboard.
-#  -- Better Mouse.
-#  -- Add type hints.
-#  -- Catch all Exceptions and react appropriately.
-#  -- Implement unimplemented classes.
-#  -- Add and allow FortuneTellers and other non-canvas classes.
-
 import tkinter
 from tkinter import font as tkinter_font
 import time
@@ -69,61 +50,14 @@ import turtle
 # All the windows that are constructed during a run share the single
 #    _master_Tk   (a tkinter.Tk object)
 # as their common root.  The first construction of a RoseWindow
-# sets this  _master_Tk to a Tkinter.Tk object.
+# sets this  _master_Tk  to a Tkinter.Tk object.
 # ----------------------------------------------------------------------
 _master_Tk = None
 
 
 # ----------------------------------------------------------------------
-# At the risk of not being Pythonic, we provide a simple type-checking
-# facility that attempts to provide meaningful error messages to
-# students when they pass arguments that are not of the expected type.
+# RoseWindow is the top-level object.  It starts with a single RoseCanvas.
 # ----------------------------------------------------------------------
-class WrongTypeException(Exception):
-    """ Not yet implemented. """
-    pass
-
-
-def check_types(pairs):
-    """ Not yet implemented fully. """
-    for pair in pairs:
-        value = pair[0]
-        expected_type = pair[1]
-        if not isinstance(value, expected_type):
-            raise WrongTypeException(pair)
-
-# ----------------------------------------------------------------------
-# Serialization facility
-# ----------------------------------------------------------------------
-
-
-def _serialize_shapes(self):
-    """Returns a list of strings representing the shapes in sorted order."""
-    # Idea: dump all the stats on all shapes, return a sorted list for easy comparison.
-    # Problem: the order in which keys appear in dictionaries is random!
-    # Solution: sort keys and manually print
-    shapes = [shape.__dict__ for shape in self.initial_canvas.shapes]
-    keys_by_shape = [sorted(shape) for shape in shapes]
-
-    for k in range(len(shapes)):
-        shapes[k]['_method_for_drawing'] = None
-        shapes[k]['shape_id_by_canvas'] = None
-
-    result = []
-    for k in range(len(keys_by_shape)):
-        shape = shapes[k]
-        result.append([])
-        for key in keys_by_shape[k]:
-            result[-1].append(str(key) + ":" + str(shape[key]))
-        result[-1] = str(result[-1])
-    return "\n".join(sorted(result))
-
-# ----------------------------------------------------------------------
-# RoseWindow is the top-level object.
-# It starts with a single RoseCanvas.
-# ----------------------------------------------------------------------
-
-
 class RoseWindow(object):
     """
     A RoseWindow is a window that pops up when constructed.
@@ -136,7 +70,7 @@ class RoseWindow(object):
     or use any of its optional arguments, as in these examples:
 
     window = rg.RoseWindow(400, 300)  # 400 wide by 300 tall
-    window = rg.RoseWindow(400, 300, 'Funny window')  # with a title
+    window = rg.RoseWindow(400, 300, "Funny window")  # with a title
 
     Instance variables include:
 
@@ -146,8 +80,8 @@ class RoseWindow(object):
       widgets: the things attached to this window
     """
 
-    def __init__(self, width=400, height=300, title='Rose Graphics',
-                 color='black', canvas_color=None,
+    def __init__(self, width=400, height=300, title="Rose Graphics",
+                 color="black", canvas_color=None,
                  make_initial_canvas=True):
         """
 
@@ -224,8 +158,8 @@ class RoseWindow(object):
         # --------------------------------------------------------------
         self.mouse = Mouse()
         self.keyboard = Keyboard()
-        self.toplevel.bind('<Button>', self._on_mouse_click)
-        self.toplevel.bind('<KeyPress>', self._on_key_press)
+        self.toplevel.bind("<Button>", self._on_mouse_click)
+        self.toplevel.bind("<KeyPress>", self._on_key_press)
 
         self.update()
 
@@ -247,10 +181,10 @@ class RoseWindow(object):
 
     def render(self, seconds_to_pause=None):
         """
-        Updates all the Shapes attached to RoseCanvas objects associated with this RoseWindow, then draws all those Shapes.
+        Updates all the Shapes attached to RoseCanvas objects associated
+        with this RoseWindow, then draws all those Shapes.
         After doing so, pauses the given number of seconds.
-
-          :type  seconds_to_pause:  int
+          :type  seconds_to_pause:  float
         """
         for widget in self.widgets:
             if type(widget) == RoseCanvas:
@@ -263,28 +197,33 @@ class RoseWindow(object):
 
     def close_on_mouse_click(self):
         """
-        Displays a message at the bottom center of the window and waits for the user to click the mouse anywhere in the window.
+        Displays a message at the bottom center of the window and waits
+        for the user to click the mouse anywhere in the window.
         Then closes this RoseWindow.
         Returns an rg.Point that specifies where the user clicked the mouse.
         """
-        message = 'To exit, click anywhere in this window'
+        message = "To exit, click anywhere in this window"
         click_position = self.continue_on_mouse_click(message=message,
                                                       close_it=True)
         return click_position
 
     def continue_on_mouse_click(self,
-                                message='To continue, click anywhere in this window',
+                                message="To continue, click anywhere in this window",
                                 x_position=None,
                                 y_position=None,
                                 close_it=False,
                                 erase_it=True):
         """
-        Displays a message at the bottom center of the window and waits for the user to click the mouse, then erases the message.
+        Displays a message at the bottom center of the window
+        and waits for the user to click the mouse, then erases the message.
 
         Optional parameters let you:
           -- Display a different message
-          -- Place the message at a different place in the window (xpos and ypos are as in Text)
-          -- Close the window after the mouse is clicked (and ignore the GraphicsError that results if the user instead chooses to click the   X   in the window)
+          -- Place the message at a different place in the window
+               (xpos and ypos are as in Text)
+          -- Close the window after the mouse is clicked (and ignore
+               the GraphicsError that results if the user instead chooses
+               to click the   X   in the window)
           -- NOT erase the message when done
         """
         if self._is_closed:
@@ -314,11 +253,12 @@ class RoseWindow(object):
 
     def get_next_mouse_click(self):
         """
-        Waits for the user to click in the window.
-        Then returns the rg.Point that represents the point where the user clicked.
+        Waits for the user to click in the window. Then returns the rg.Point
+        that represents the point where the user clicked.
 
         Example:
-        If this method is called and then the user clicks near the upper-right corner of a 300 x 500 window,
+        If this method is called and then the user clicks near
+        the upper-right corner of a 300 x 500 window,
         this function would return something like rg.Point(295, 5).
         """
         self.mouse.position = None
@@ -343,17 +283,19 @@ class RoseWindow(object):
 
 #      def add_canvas(self, width=None, height=None, background_color=0):
 # FIXME: Set defaults based on the main canvas.
-#         new_canvas = RoseCanvas(self, background_color='white')
+#         new_canvas = RoseCanvas(self, background_color="white")
 #         self.widgets.append(new_canvas)
 #
 #         _root.update()
 
     def __serialize_shapes(self):
-        """Returns a list of strings representing the shapes in sorted order."""
+        """
+        Returns a list of strings representing the shapes in sorted order.
+        """
         return _serialize_shapes(self)
 
 
-class RoseWidget():
+class RoseWidget(object):
     """
        A Widget is a thing that one can put on a Window,
        e.g. a Canvas, FortuneTeller, etc.
@@ -367,7 +309,7 @@ class RoseWidget():
 
 
 class RoseCanvas(RoseWidget):
-    defaults = {'colors': [None, 'yellow', 'light blue', 'dark grey']}
+    defaults = {"colors": [None, "yellow", "light blue", "dark grey"]}
     count = 0
 
     """
@@ -388,8 +330,8 @@ class RoseCanvas(RoseWidget):
 
 
 #         if background_color == 0:
-#             index = RoseCanvas.count % len(defaults['colors'])
-#             self.background_color = defaults['colors'][index]
+#             index = RoseCanvas.count % len(defaults["colors"])
+#             self.background_color = defaults["colors"][index]
 #         else:
 #             self.background_color = background_color
 
@@ -404,10 +346,9 @@ class RoseCanvas(RoseWidget):
 
     def render(self, seconds_to_pause=None):
         """
-        Updates all the Shapes attached to this RoseCanvas, then draws all those Shapes.
-        After doing so, pauses the given number of seconds.
-
-          :type  seconds_to_pause:  int
+        Updates all the Shapes attached to this RoseCanvas, then draws
+        all those Shapes.  After doing so, pauses the given number of seconds.
+          :type  seconds_to_pause:  float
         """
         self._update_shapes()
         self._window.update()
@@ -428,10 +369,10 @@ class RoseCanvas(RoseWidget):
             self._tkinter_canvas.coords(shape.shape_id_by_canvas[self],
                                         *coordinates)
         except tkinter.TclError:
-            msg = 'Could not place the shape\n'
-            msg += 'on the given window.\n'
-            msg += 'Did you accidentally close a window\n'
-            msg += 'that later needed to be rendered again?'
+            msg = "Could not place the shape\n"
+            msg += "on the given window.\n"
+            msg += "Did you accidentally close a window\n"
+            msg += "that later needed to be rendered again?"
             raise Exception(msg) from None
 
         self._tkinter_canvas.itemconfigure(shape.shape_id_by_canvas[self],
@@ -487,8 +428,8 @@ class __FreezeClass__ (type):
     """Prevents class variable assignment."""
 
     def __setattr__(self, name, _ignored):  # last parameter is the value
-        err = "You tried to set the instance variable '" + name + "'\n"
-        err += "   on the CLASS '" + self.__name__ + "'"
+        err = "You tried to set the instance variable "" + name + ""\n"
+        err += "   on the CLASS "" + self.__name__ + """
         err += ", which is not an OBJECT.\n"
         err += "   Did you forget the () after the word "
         err += self.__name__ + ",\n"
@@ -538,7 +479,7 @@ class _Shape(object, metaclass=__FreezeClass__):
 
     def attach_to(self, window_or_canvas):
         """
-        'draws' this Shape.  More precisely:
+        "draws" this Shape.  More precisely:
         Attaches this Shape to the given
         RoseWindow or RoseCanvas. When that
         RoseWindow/RoseCanvas is rendered, this shape
@@ -550,7 +491,7 @@ class _Shape(object, metaclass=__FreezeClass__):
 
     def detach_from(self, rose_canvas):
         """
-        'undraws' this Shape.  More precisely:
+        "undraws" this Shape.  More precisely:
         Detaches this Shape from the given
         RoseWindow or RoseCanvas. When that
         RoseWindow/RoseCanvas is rendered,
@@ -574,25 +515,25 @@ class _ShapeWithOutline(object):
     Public data attributes:  fill_color, outline_color, outline_thickness.
     Public methods:  _initialize_options.
     """
-    defaults = {'fill_color': None,
-                'outline_color': 'black',
-                'outline_thickness': 1}
+    defaults = {"fill_color": None,
+                "outline_color": "black",
+                "outline_thickness": 1}
 
     def _initialize_options(self):
-        self.fill_color = _ShapeWithOutline.defaults['fill_color']
-        self.outline_color = _ShapeWithOutline.defaults['outline_color']
+        self.fill_color = _ShapeWithOutline.defaults["fill_color"]
+        self.outline_color = _ShapeWithOutline.defaults["outline_color"]
         self.outline_thickness = _ShapeWithOutline.defaults[
-            'outline_thickness']
+            "outline_thickness"]
 
     def _get_options_for_drawing(self):
-        options = {'fill': self.fill_color,
-                   'outline': self.outline_color,
-                   'width': self.outline_thickness}
+        options = {"fill": self.fill_color,
+                   "outline": self.outline_color,
+                   "width": self.outline_thickness}
 
         # If a color is None, that means transparent here:
-        for option in ('fill', 'outline'):
+        for option in ("fill", "outline"):
             if not options[option]:
-                options[option] = ''
+                options[option] = ""
 
         return options
 
@@ -608,23 +549,23 @@ class _ShapeWithThickness(object):
     Public data attributes:  color, thickness.
     Public methods:  _initialize_options.
     """
-    defaults = {'color': 'black',
-                'thickness': 1,
-                'arrow': None}
+    defaults = {"color": "black",
+                "thickness": 1,
+                "arrow": None}
 
     def _initialize_options(self):
-        self.color = _ShapeWithThickness.defaults['color']
-        self.thickness = _ShapeWithThickness.defaults['thickness']
-        self.arrow = _ShapeWithThickness.defaults['arrow']
+        self.color = _ShapeWithThickness.defaults["color"]
+        self.thickness = _ShapeWithThickness.defaults["thickness"]
+        self.arrow = _ShapeWithThickness.defaults["arrow"]
 
     def _get_options_for_drawing(self):
-        options = {'fill': self.color,
-                   'width': self.thickness,
-                   'arrow': self.arrow}
+        options = {"fill": self.color,
+                   "width": self.thickness,
+                   "arrow": self.arrow}
 
-        # If a color is None, that means 'black' here:
-        if options['fill'] is None:
-            options['fill'] = 'black'
+        # If a color is None, that means "black" here:
+        if options["fill"] is None:
+            options["fill"] = "black"
 
         return options
 
@@ -642,33 +583,33 @@ class _ShapeWithText(object):
     Public methods:  _initialize_options.
     """
     # FIXME: Add more to the above docstring.
-    defaults = {'font_family': 'helvetica',
-                'font_size': 14,
-                'weight':  'normal',
-                'slant':  'roman',
-                'underline':  0,
-                'overstrike':  0,
-                'justify': tkinter.CENTER,
-                'text_box_width': None,
-                'text_color': 'black',
-                'text': ''}
+    defaults = {"font_family": "helvetica",
+                "font_size": 14,
+                "weight":  "normal",
+                "slant":  "roman",
+                "underline":  0,
+                "overstrike":  0,
+                "justify": tkinter.CENTER,
+                "text_box_width": None,
+                "text_color": "black",
+                "text": ""}
 
     def _initialize_options(self):
-        self.font_family = _ShapeWithText.defaults['font_family']
-        self.font_size = _ShapeWithText.defaults['font_size']
-        self.is_bold = _ShapeWithText.defaults['weight'] == 'bold'
-        self.is_italic = _ShapeWithText.defaults['slant'] == 'italic'
-        self.is_underline = _ShapeWithText.defaults['underline'] == 1
-        self.is_overstrike = _ShapeWithText.defaults['overstrike'] == 1
+        self.font_family = _ShapeWithText.defaults["font_family"]
+        self.font_size = _ShapeWithText.defaults["font_size"]
+        self.is_bold = _ShapeWithText.defaults["weight"] == "bold"
+        self.is_italic = _ShapeWithText.defaults["slant"] == "italic"
+        self.is_underline = _ShapeWithText.defaults["underline"] == 1
+        self.is_overstrike = _ShapeWithText.defaults["overstrike"] == 1
 
-        self.justify = _ShapeWithText.defaults['justify']
-        self.text_box_width = _ShapeWithText.defaults['text_box_width']
-        self.text_color = _ShapeWithText.defaults['text_color']
-        self.text = _ShapeWithText.defaults['text']
+        self.justify = _ShapeWithText.defaults["justify"]
+        self.text_box_width = _ShapeWithText.defaults["text_box_width"]
+        self.text_color = _ShapeWithText.defaults["text_color"]
+        self.text = _ShapeWithText.defaults["text"]
 
     def _get_options_for_drawing(self):
-        weight = 'bold' if self.is_bold else 'normal'
-        slant = 'italic' if self.is_italic else 'roman'
+        weight = "bold" if self.is_bold else "normal"
+        slant = "italic" if self.is_italic else "roman"
         underline = 1 if self.is_underline else 0
         overstrike = 1 if self.is_overstrike else 0
         font = tkinter_font.Font(family=self.font_family,
@@ -678,12 +619,12 @@ class _ShapeWithText(object):
                                  underline=underline,
                                  overstrike=overstrike)
 
-        options = {'font': font,
-                   'justify': self.justify,
-                   'fill': self.text_color,
-                   'text': self.text}
+        options = {"font": font,
+                   "justify": self.justify,
+                   "fill": self.text_color,
+                   "text": self.text}
         if self.text_box_width:
-            options['width'] = self.text_box_width
+            options["width"] = self.text_box_width
 
         return options
 
@@ -784,10 +725,10 @@ class _RectangularShape(_Shape):
 
     def __repr__(self):
         """ Returns a string representation of this shape. """
-        f_string = ''
-        f_string += '{}: corner_1=({}, {}), corner_2=({}, {}),'
-        f_string += ' fill_color={},'
-        f_string += ' outline_color={}, outline_thickness={}.'
+        f_string = ""
+        f_string += "{}: corner_1=({}, {}), corner_2=({}, {}),"
+        f_string += " fill_color={},"
+        f_string += " outline_color={}, outline_thickness={}."
         return f_string.format(self.__class__.__name__,
                                self.corner_1.x, self.corner_1.y,
                                self.corner_2.x, self.corner_2.y,
@@ -929,11 +870,11 @@ class Circle(_ShapeWithCenter, _ShapeWithOutline):
 
     fill_color:
     The Circle is filled with this color.
-    Example:  circle.fill_color = 'green'
+    Example:  circle.fill_color = "green"
 
     outline_color:
     The outline of the Circle is this color.
-    Example:  circle.outline_color = 'blue'
+    Example:  circle.outline_color = "blue"
 
     outline_thickness:  The thickness (in pixels)
     of the outline of the Circle.
@@ -943,8 +884,8 @@ class Circle(_ShapeWithCenter, _ShapeWithOutline):
 
        print(circle.center, circle.radius)
 
-       circle.fill_color = 'blue'
-       circle.outline_color = 'black'
+       circle.fill_color = "blue"
+       circle.outline_color = "black"
        circle.outline_thickness = 5
 
        window = rg.RoseWindow()
@@ -980,9 +921,9 @@ class Circle(_ShapeWithCenter, _ShapeWithOutline):
 
     def __repr__(self):
         """ Returns a string representation of this Circle. """
-        f_string = ''
-        f_string += 'Circle: center=({}, {}), radius={}, fill_color={}, '
-        f_string += 'outline_color={}, outline_thickness={}.'
+        f_string = ""
+        f_string += "Circle: center=({}, {}), radius={}, fill_color={}, "
+        f_string += "outline_color={}, outline_thickness={}."
         return f_string.format(self.center.x, self.center.y,
                                self.radius,
                                self.fill_color, self.outline_color,
@@ -1043,11 +984,11 @@ class Ellipse(_RectangularShape, _ShapeWithOutline):
 
     fill_color:
     The Ellipse is filled with this color.
-    Example:  ellipse.fill_color = 'green'
+    Example:  ellipse.fill_color = "green"
 
     outline_color:
     The outline of the Ellipse is this color.
-    Example:  ellipse.outline_color = 'blue'
+    Example:  ellipse.outline_color = "blue"
 
     outline_thickness:  The thickness (in pixels)
     of the outline of the Ellipse.
@@ -1059,8 +1000,8 @@ class Ellipse(_RectangularShape, _ShapeWithOutline):
 
        print(ellipse.corner_1, ellipse.corner_2)
 
-       ellipse.fill_color = 'blue'
-       ellipse.outline_color = 'black'
+       ellipse.fill_color = "blue"
+       ellipse.outline_color = "black"
        ellipse.outline_thickness = 5
 
        window = rg.RoseWindow()
@@ -1142,11 +1083,11 @@ class Line(_Shape, _ShapeWithThickness):
       arrow:  Specifies whether or not the Line
       is drawn as an arrow. Possible values are:
       - None      draw the Line without arrow-heads
-      - 'first'   draw an arrow-head at the start
-      - 'last'    draw an arrow-head at the end
-      - 'both'    draw an arrow-head at both
+      - "first"   draw an arrow-head at the start
+      - "last"    draw an arrow-head at the end
+      - "both"    draw an arrow-head at both
       For example, if my_line is a Line, then
-      -    my_line.arrow = 'last'
+      -    my_line.arrow = "last"
       makes the Line be drawn as an arrow
       from its start point to its end point.
 
@@ -1155,12 +1096,12 @@ class Line(_Shape, _ShapeWithThickness):
        end = rg.Point(200, 30)
        line = rg.Line(start, end)
 
-       line.color = 'blue'
+       line.color = "blue"
        line.thickness = 3
-       line.arrow = 'both'  # A double-sided arrow
+       line.arrow = "both"  # A double-sided arrow
        line.arrow = None    # Just a line (no arrow)
-       line.arrow = 'first' # Arrow from end to start
-       line.arrow = 'last'  # Arrow from start to end
+       line.arrow = "first" # Arrow from end to start
+       line.arrow = "last"  # Arrow from start to end
 
        window = rg.RoseWindow()
        line.attach_to(window)
@@ -1187,9 +1128,9 @@ class Line(_Shape, _ShapeWithThickness):
 
     def __repr__(self):
         """ Returns a string representation of this Line. """
-        f_string = ''
-        f_string += 'Line: start=({}, {}), end=({}, {}), color={}, '
-        f_string += 'thickness={}, arrow={}.'
+        f_string = ""
+        f_string += "Line: start=({}, {}), end=({}, {}), color={}, "
+        f_string += "thickness={}, arrow={}."
         return f_string.format(self.start.x, self.start.y,
                                self.end.x, self.end.y,
                                self.color, self.thickness, self.arrow)
@@ -1253,11 +1194,11 @@ class Point(_Shape, _ShapeWithOutline):
     The Point is filled with this color.
     Note that a Point is drawn as a small, filled
     circle, which is why it has a fill_color, etc.
-    Example:  p.fill_color = 'green'
+    Example:  p.fill_color = "green"
 
     outline_color:
     The outline of the Point is this color.
-    Example:  p.outline_color = 'blue'
+    Example:  p.outline_color = "blue"
 
     outline_thickness:  The thickness (in pixels)
     of the outline of the Point.
@@ -1277,15 +1218,15 @@ class Point(_Shape, _ShapeWithOutline):
        p.x = p.x - 50
        p.y = p.y + 60
 
-       p.fill_color = 'blue'
-       p.outline_color = 'black'
+       p.fill_color = "blue"
+       p.outline_color = "black"
        p.outline_thickness = 1
     """
-    defaults = {'width_for_drawing': 5,
-                'height_for_drawing': 5,
-                'fill_color': 'black',
-                'outline_color': 'black',
-                'outline_thickness': 1}
+    defaults = {"width_for_drawing": 5,
+                "height_for_drawing": 5,
+                "fill_color": "black",
+                "outline_color": "black",
+                "outline_thickness": 1}
 
     def __init__(self, x, y):
         """
@@ -1294,19 +1235,19 @@ class Point(_Shape, _ShapeWithOutline):
         """
         super().__init__(tkinter.Canvas.create_oval)
 
-        self.fill_color = Point.defaults['fill_color']
-        self.outline_color = Point.defaults['outline_color']
-        self.outline_thickness = Point.defaults['outline_thickness']
+        self.fill_color = Point.defaults["fill_color"]
+        self.outline_color = Point.defaults["outline_color"]
+        self.outline_thickness = Point.defaults["outline_thickness"]
 
         self.x = x
         self.y = y
 
-        self.width_for_drawing = Point.defaults['width_for_drawing']
-        self.height_for_drawing = Point.defaults['height_for_drawing']
+        self.width_for_drawing = Point.defaults["width_for_drawing"]
+        self.height_for_drawing = Point.defaults["height_for_drawing"]
 
     def __repr__(self):
         """ Returns a string representation of this Point. """
-        return 'Point({:.1f}, {:.1f})'.format(self.x, self.y)
+        return "Point({:.1f}, {:.1f})".format(self.x, self.y)
 
     def clone(self):
         """ Returns a copy of this Point. """
@@ -1385,11 +1326,11 @@ class Rectangle(_RectangularShape, _ShapeWithOutline):
 
     fill_color:
     The Rectangle is filled with this color.
-    Example:  rect.fill_color = 'green'
+    Example:  rect.fill_color = "green"
 
     outline_color:
     The outline of the Rectangle is this color.
-    Example:  rect.outline_color = 'blue'
+    Example:  rect.outline_color = "blue"
 
     outline_thickness:  The thickness (in pixels)
     of the outline of the Rectangle.
@@ -1401,8 +1342,8 @@ class Rectangle(_RectangularShape, _ShapeWithOutline):
 
        print(rect.corner_1, rect.corner_2)
 
-       rect.fill_color = 'blue'
-       rect.outline_color = 'black'
+       rect.fill_color = "blue"
+       rect.outline_color = "black"
        rect.outline_thickness = 5
 
        window = rg.RoseWindow()
@@ -1481,11 +1422,11 @@ class Square(_ShapeWithCenter, _ShapeWithOutline):
 
     fill_color:
     The Square is filled with this color.
-    Example:  square.fill_color = 'green'
+    Example:  square.fill_color = "green"
 
     outline_color:
     The outline of the Square is this color.
-    Example:  square.outline_color = 'blue'
+    Example:  square.outline_color = "blue"
 
     outline_thickness:  The thickness (in pixels)
     of the outline of the Square.
@@ -1495,8 +1436,8 @@ class Square(_ShapeWithCenter, _ShapeWithOutline):
 
        print(square.center, square.length_of_each_side)
 
-       square.fill_color = 'blue'
-       square.outline_color = 'black'
+       square.fill_color = "blue"
+       square.outline_color = "black"
        square.outline_thickness = 5
 
        window = rg.RoseWindow()
@@ -1532,9 +1473,9 @@ class Square(_ShapeWithCenter, _ShapeWithOutline):
 
     def __repr__(self):
         """ Returns a string representation of this Square. """
-        f_string = ''
-        f_string += 'Square: center=({}, {}), side-lengths={}, '
-        f_string += 'fill_color={}, outline_color={}, outline_thickness={}.'
+        f_string = ""
+        f_string += "Square: center=({}, {}), side-lengths={}, "
+        f_string += "fill_color={}, outline_color={}, outline_thickness={}."
         return f_string.format(self.center.x, self.center.y,
                                self.length_of_each_side,
                                self.fill_color, self.outline_color,
@@ -1571,7 +1512,7 @@ class Text(_ShapeWithCenter, _ShapeWithText):
       is_italic (True or False),
       is_underline (True or False),
       is _overstrike (True or False),
-      text_color (color used to display the text, default is 'black')
+      text_color (color used to display the text, default is "black")
       text (the string to be displayed).
     Public methods: attach_to, move_by, move_center_to.
     """
@@ -1658,8 +1599,8 @@ class Color(object):
 
 class _RoseWindowStub(RoseWindow):
 
-    def __init__(self, width=400, height=300, title='Rose Graphics',
-                 color='black', canvas_color=None,
+    def __init__(self, width=400, height=300, title="Rose Graphics",
+                 color="black", canvas_color=None,
                  make_initial_canvas=True):
         canvas_color = "white"  # FIXME
         self._is_closed = False
@@ -1678,7 +1619,8 @@ class _RoseWindowStub(RoseWindow):
         return None
 
     def continue_on_mouse_click(self,
-                                message='To continue, click anywhere in this window',
+                                message=("To continue, " +
+                                         "click anywhere in this window"),
                                 x_position=None,
                                 y_position=None,
                                 close_it=False,
@@ -1686,7 +1628,9 @@ class _RoseWindowStub(RoseWindow):
         return None
 
     def _serialize_shapes(self):
-        """Returns a list of strings representing the shapes in sorted order."""
+        """
+        Returns a list of strings representing the shapes in sorted order.
+        """
         return _serialize_shapes(self)
 
 
@@ -1702,7 +1646,7 @@ class _RoseCanvasStub(RoseCanvas):
         self.shapes.append(shape)
 
     def render(self, seconds_to_pause=None):
-        # super().render()  # don't pause
+        # super().render()  # don"t pause
         pass
 
 
@@ -1713,6 +1657,9 @@ class TurtleWindow(object):
         turtle.Turtle._screen = self._screen
 
     def close_on_mouse_click(self):
+        message = "To exit, click anywhere in this window"
+        self.display_message(message, Point(0, 280))
+
         self._screen.exitonclick()
 
         # We may need the statement:
@@ -1725,13 +1672,20 @@ class TurtleWindow(object):
         # (something flashed) but nothing worse.  At time time
         # it is commented-out, since we need only a single TurtleWindow.
 
-        turtle.TurtleScreen._RUNNING = True
+        # turtle.TurtleScreen._RUNNING = True
+
+    def display_message(self, message, point):
+        """ Displays the given message at the given Point. """
+        self._screen._canvas.create_text(point.x, point.y, text=message)
 
     def delay(self, milliseconds=None):
         self._screen.delay(milliseconds)
 
     def tracer(self, n=None, delay=None):
         self._screen.tracer(n, delay)
+
+    def update(self):
+        self._screen.update()
 
 
 class ShapesWindow(RoseWindow):
@@ -1746,8 +1700,8 @@ class SimpleTurtle(object):
 
     To construct a SimpleTurtle, use:
        rg.SimpleTurtle(shape)
-    where  shape  is OPTIONAL and can be any of:  'turtle'
-    'arrow'  'classic'  'square'  'circle'  'triangle'  'blank'
+    where  shape  is OPTIONAL and can be any of:  "turtle"
+    "arrow"  "classic"  "square"  "circle"  "triangle"  "blank"
 
     Instance variables include:
 
@@ -1767,10 +1721,10 @@ class SimpleTurtle(object):
        natacha = rg.SimpleTurtle()
        natacha.forward(100)
 
-       boris = rg.SimpleTurtle('turtle')
+       boris = rg.SimpleTurtle("turtle")
        boris.speed = 8
-       boris.pen = rg.Pen('blue', 5)  # blue line 5 pixels thick
-       boris.paint_bucket = rg.PaintBucket('red')
+       boris.pen = rg.Pen("blue", 5)  # blue line 5 pixels thick
+       boris.paint_bucket = rg.PaintBucket("red")
 
        # Moves with pen down, then with pen up, then with pen down again:
        boris.left(90)
@@ -1786,11 +1740,13 @@ class SimpleTurtle(object):
        boris.end_fill()
     """
 
-    def __init__(self, shape='classic'):
+    def __init__(self, shape="classic"):
         """
         What comes in:
-          A turtle.Shape that determines how the Turtle looks.  Defaults to
-          a Bitmap of the "classic" Turtle (an arrowhead) from early Turtle Graphics.
+          A turtle.Shape that determines how the Turtle looks.
+          Defaults to a Bitmap of the "classic" Turtle (an arrowhead) from
+          early Turtle Graphics.  Shapes allowed are:
+          "turtle"  "arrow"  "classic"  "square"  "circle"  "triangle"  "blank"
 
         Side effects: Constructs and stores in  self._turtle  the "real" Turtle
           to do all the work on behalf of this SimpleTurtle.  This (purposely)
@@ -1799,8 +1755,8 @@ class SimpleTurtle(object):
         :type shape: str
         """
         self.speed = 1
-        self.pen = Pen('black', 1)
-        self.paint_bucket = PaintBucket('black')
+        self.pen = Pen("black", 1)
+        self.paint_bucket = PaintBucket("black")
 
         self._turtle = turtle.Turtle(shape)
         self._update_real_turtle()
@@ -1860,6 +1816,28 @@ class SimpleTurtle(object):
         """
         self._update_real_turtle()
         self._turtle.goto(point.x, point.y)
+
+    def set_heading(self, to_angle):
+        """
+        Sets the "heading" of this SimpleTurtle, that is,
+        the direction that the SimpleTurtle is pointing,
+        to the given number of degrees from the x-axis.
+        Examples:
+           turtle.set_heading(0)
+              makes the SimpleTurtle point east (i.e. to the right)
+           turtle.set_heading(270)
+              makes the SimpleTurtle point south (i.e. down)
+           turtle.set_heading(45)
+              makes the SimpleTurtle point up and to the right
+
+        The   to_angle   parameter is normally set to a number between
+        0 and 360, but negative angles work too, in the way you might expect.
+
+        Type hints:
+          :type to_angle: float
+        """
+        self._update_real_turtle()
+        self._turtle.setheading(to_angle)
 
     def draw_circle(self, radius):
         """
@@ -1950,7 +1928,7 @@ class SimpleTurtle(object):
         Example (assuming  sally  is an rg.SimpleTurtle) that fills
         a triangle with green:
 
-        sally.paint_bucket = rg.PaintBucket('green')
+        sally.paint_bucket = rg.PaintBucket("green")
         sally.begin_fill()
 
         sally.forward(100)
@@ -1972,7 +1950,7 @@ class SimpleTurtle(object):
         Example (assuming  sally  is an rg.SimpleTurtle) that fills
         a triangle with green:
 
-        sally.paint_bucket = rg.PaintBucket('green')
+        sally.paint_bucket = rg.PaintBucket("green")
         sally.begin_fill()
 
         sally.forward(100)
@@ -2012,16 +1990,16 @@ class Pen(object):
 
     To construct a Pen, use:
        rg.Pen(color, thickness)
-    where  color   is a color (e.g. 'red')
+    where  color   is a color (e.g. "red")
     and   thickness  is a small positive integer.
 
     Instance variables are:
       color:  The color of the Pen
-      thickness:  The thickness of the Pen 
+      thickness:  The thickness of the Pen
 
     Examples:
-       thick_blue = rg.Pen('blue', 14)
-       thin_red = rg.Pen('red', 1)
+       thick_blue = rg.Pen("blue", 14)
+       thin_red = rg.Pen("red", 1)
     """
 
     def __init__(self, color, thickness):
@@ -2036,14 +2014,80 @@ class PaintBucket(object):
 
     To construct a PaintBucket, use:
        rg.PaintBucket(color)
-    where  color   is a color (e.g. 'red').
+    where  color   is a color (e.g. "red").
 
     Instance variables are:
       color:  The color of the PaintBucket
 
     Example:
-       paint = rg.PaintBucket('green')
+       paint = rg.PaintBucket("green")
     """
 
     def __init__(self, color):
         self.color = color
+
+
+# ----------------------------------------------------------------------
+# At the risk of not being Pythonic, we provide a simple type-checking
+# facility that attempts to provide meaningful error messages to
+# students when they pass arguments that are not of the expected type.
+# ----------------------------------------------------------------------
+class WrongTypeException(Exception):
+    """ Not yet implemented. """
+    pass
+
+
+def check_types(pairs):
+    """ Not yet implemented fully. """
+    for pair in pairs:
+        value = pair[0]
+        expected_type = pair[1]
+        if not isinstance(value, expected_type):
+            raise WrongTypeException(pair)
+
+
+# ----------------------------------------------------------------------
+# Serialization facility
+# ----------------------------------------------------------------------
+
+
+def _serialize_shapes(self):
+    """ Returns a list of strings representing the shapes in sorted order. """
+    # Idea: dump all the stats on all shapes,
+    # then return a sorted list for easy comparison.
+    # Problem: the order in which keys appear in dictionaries is random!
+    # Solution: sort keys and manually print
+    shapes = [shape.__dict__ for shape in self.initial_canvas.shapes]
+    keys_by_shape = [sorted(shape) for shape in shapes]
+
+    for k in range(len(shapes)):
+        shapes[k]["_method_for_drawing"] = None
+        shapes[k]["shape_id_by_canvas"] = None
+
+    result = []
+    for k in range(len(keys_by_shape)):
+        shape = shapes[k]
+        result.append([])
+        for key in keys_by_shape[k]:
+            result[-1].append(str(key) + ":" + str(shape[key]))
+        result[-1] = str(result[-1])
+    return "\n".join(sorted(result))
+
+# FIXME (errors):
+#  -- clone() does not really make a copy; it just makes a new one
+#     but without cloning all the attributes.
+#  -- _ShapeWithCenter claims that things like Ellipse are subclasses,
+#     but they are not at this point, I think.  In general, need to
+#     deal with overlap between _ShapeWithCenter and _RectangularShape.
+#     KEEP both of them to have some classes have corner_1 and corner_2
+#     while others have center and ...
+
+# FIXME (things that have yet to be implemented):
+#  -- Allow multiple canvasses.
+#  -- Better close_on ... ala zellegraphics.
+#  -- Keyboard.
+#  -- Better Mouse.
+#  -- Add type hints.
+#  -- Catch all Exceptions and react appropriately.
+#  -- Implement unimplemented classes.
+#  -- Add and allow FortuneTellers and other non-canvas classes.
